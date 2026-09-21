@@ -17,7 +17,7 @@ A professional Android application designed to manage installation jobs, track a
 *   **Auth**: Firebase Authentication (Google Identity).
 *   **Backend**: PHP 8.x (REST API).
 *   **Database**: MySQL / phpMyAdmin.
-*   **Hosting**: Local (XAMPP/WAMP) or Production (Afrihost/cPanel).
+*   **Hosting**: Local (XAMPP/WAMP) or Production (Afrihost/cPanel). coming soon fecture
 
 ## 📋 Prerequisites
 
