@@ -7,6 +7,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.graphics.toColorInt
 import androidx.viewpager2.widget.ViewPager2
 import com.awesum.assetmanagement.ui.auth.LoginActivity
+import com.awesum.assetmanagement.ui.order.OrdersActivity
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.firebase.auth.FirebaseAuth
@@ -23,9 +24,13 @@ class MainActivity : AppCompatActivity() {
             return
         }
 
+        val jobId = intent.getIntExtra(Constants.EXTRA_JOB_ID, Constants.CURRENT_JOB_ID)
+        Constants.CURRENT_JOB_ID = jobId
+
         setContentView(R.layout.activity_main)
 
         val viewPager = findViewById<ViewPager2>(R.id.viewPager)
+        val btnOrders = findViewById<TextView>(R.id.btnOrders)
         val tabAssetMgmt = findViewById<TextView>(R.id.tabAssetMgmt)
         val tabReflection = findViewById<TextView>(R.id.tabReflection)
         val btnLogout = findViewById<TextView>(R.id.btnLogout)
@@ -41,6 +46,13 @@ class MainActivity : AppCompatActivity() {
                 tabReflection.setTextColor("#F2A93B".toColorInt())
                 tabAssetMgmt.setTextColor("#8892A6".toColorInt())
             }
+        }
+
+        btnOrders.setOnClickListener {
+            val intent = Intent(this, OrdersActivity::class.java)
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP)
+            startActivity(intent)
+            finish()
         }
 
         tabAssetMgmt.setOnClickListener { viewPager.currentItem = 0 }
@@ -59,9 +71,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun logout() {
         FirebaseAuth.getInstance().signOut()
-        // Also sign out of the Google client so the account picker shows again next time.
-        GoogleSignIn.getClient(this, GoogleSignInOptions.DEFAULT_SIGN_IN)
-            .signOut()
+        GoogleSignIn.getClient(this, GoogleSignInOptions.DEFAULT_SIGN_IN).signOut()
         SessionManager.clear(this)
         startActivity(Intent(this, LoginActivity::class.java))
         finish()

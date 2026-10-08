@@ -1,10 +1,8 @@
 package com.awesum.assetmanagement.ui.asset
 
 import android.content.Intent
-import android.graphics.Color
 import android.os.Bundle
 import android.view.View
-import android.view.ViewGroup
 import android.widget.TextView
 import android.widget.Toast
 import androidx.core.graphics.toColorInt
@@ -28,7 +26,8 @@ import kotlinx.coroutines.launch
 
 class AssetManagementFragment : Fragment(R.layout.fragment_asset_management) {
 
-    private val jobId = Constants.CURRENT_JOB_ID
+    private val jobId: Int
+        get() = arguments?.getInt(Constants.EXTRA_JOB_ID) ?: Constants.CURRENT_JOB_ID
 
     private lateinit var swipeRefresh: androidx.swiperefreshlayout.widget.SwipeRefreshLayout
     private lateinit var tvJobCode: TextView
@@ -99,13 +98,22 @@ class AssetManagementFragment : Fragment(R.layout.fragment_asset_management) {
         chipVehicle.setOnClickListener { setFilter("Vehicle") }
 
         btnAddAsset.setOnClickListener {
-            startActivity(Intent(requireContext(), AddAssetActivity::class.java))
+            val intent = Intent(requireContext(), AddAssetActivity::class.java).apply {
+                putExtra(Constants.EXTRA_JOB_ID, jobId)
+            }
+            startActivity(intent)
         }
         btnAddMember.setOnClickListener {
-            startActivity(Intent(requireContext(), AddMemberActivity::class.java))
+            val intent = Intent(requireContext(), AddMemberActivity::class.java).apply {
+                putExtra(Constants.EXTRA_JOB_ID, jobId)
+            }
+            startActivity(intent)
         }
         btnUploadPhoto.setOnClickListener {
-            startActivity(Intent(requireContext(), UploadPhotoActivity::class.java))
+            val intent = Intent(requireContext(), UploadPhotoActivity::class.java).apply {
+                putExtra(Constants.EXTRA_JOB_ID, jobId)
+            }
+            startActivity(intent)
         }
         btnSaveDraft.setOnClickListener { submitJobLog(draft = true) }
         btnSubmitJobLog.setOnClickListener { submitJobLog(draft = false) }
@@ -216,7 +224,6 @@ class AssetManagementFragment : Fragment(R.layout.fragment_asset_management) {
     }
 
     private fun formatDate(raw: String): String {
-        // raw comes back as "2026-08-29 07:30:00" -> "2026-08-29 · 07:30"
         return try {
             val parts = raw.split(" ")
             val datePart = parts[0]

@@ -25,6 +25,8 @@
 
         <activity android:name=".ui.auth.RegisterActivity" android:exported="false" />
 
+        <activity android:name=".ui.order.OrdersActivity" android:exported="false" />
+
         <activity
             android:name=".MainActivity"
             android:exported="false" />

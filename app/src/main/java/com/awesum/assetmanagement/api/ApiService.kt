@@ -8,6 +8,16 @@ import retrofit2.http.*
 
 interface ApiService {
 
+    @GET("get_orders.php")
+    suspend fun getOrders(): Response<ApiResponse<List<Order>>>
+
+    @FormUrlEncoded
+    @POST("get_or_create_job_for_order.php")
+    suspend fun getOrCreateJobForOrder(
+        @Field("order_id") orderId: Int,
+        @Field("user_id") userId: Int
+    ): Response<ApiResponse<Job>>
+
     @GET("get_job.php")
     suspend fun getJob(@Query("job_id") jobId: Int): Response<ApiResponse<Job>>
 

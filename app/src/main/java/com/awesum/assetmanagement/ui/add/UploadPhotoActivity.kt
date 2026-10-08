@@ -29,7 +29,9 @@ import java.io.File
 
 class UploadPhotoActivity : AppCompatActivity() {
 
-    private val jobId = Constants.CURRENT_JOB_ID
+    private val jobId: Int
+        get() = intent.getIntExtra(Constants.EXTRA_JOB_ID, Constants.CURRENT_JOB_ID)
+
     private var selectedUri: Uri? = null
 
     private val pickImageLauncher = registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->

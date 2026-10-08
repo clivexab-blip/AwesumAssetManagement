@@ -14,7 +14,8 @@ import kotlinx.coroutines.launch
 
 class AddAssetActivity : AppCompatActivity() {
 
-    private val jobId = Constants.CURRENT_JOB_ID
+    private val jobId: Int
+        get() = intent.getIntExtra(Constants.EXTRA_JOB_ID, Constants.CURRENT_JOB_ID)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

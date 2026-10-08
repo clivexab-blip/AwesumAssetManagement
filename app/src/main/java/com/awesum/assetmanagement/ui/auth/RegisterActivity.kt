@@ -11,8 +11,8 @@ import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
-import com.awesum.assetmanagement.MainActivity
 import com.awesum.assetmanagement.R
+import com.awesum.assetmanagement.ui.order.OrdersActivity
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
@@ -131,7 +131,7 @@ class RegisterActivity : AppCompatActivity() {
     }
 
     private fun goToMain() {
-        startActivity(Intent(this, MainActivity::class.java))
+        startActivity(Intent(this, OrdersActivity::class.java))
         finishAffinity()
     }
 

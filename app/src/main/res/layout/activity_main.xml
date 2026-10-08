@@ -24,8 +24,8 @@
             android:layout_weight="1"
             android:text="AWESUM"
             android:textColor="@color/accent_orange"
-            android:textStyle="bold"
-            android:textSize="14sp" />
+            android:textSize="14sp"
+            android:textStyle="bold" />
 
         <LinearLayout
             android:layout_width="wrap_content"
@@ -34,36 +34,47 @@
             android:orientation="horizontal">
 
             <TextView
+                android:id="@+id/btnOrders"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="12dp"
+                android:padding="4dp"
+                android:text="← ORDERS"
+                android:textColor="@color/text_secondary"
+                android:textSize="11sp"
+                android:textStyle="bold" />
+
+            <TextView
                 android:id="@+id/tabAssetMgmt"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:padding="4dp"
                 android:text="JOB LOG"
                 android:textColor="@color/accent_orange"
-                android:textStyle="bold"
                 android:textSize="13sp"
-                android:padding="4dp" />
+                android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/tabReflection"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="12dp"
+                android:padding="4dp"
                 android:text="REFLECTION"
                 android:textColor="@color/text_secondary"
-                android:textStyle="bold"
                 android:textSize="13sp"
-                android:padding="4dp" />
+                android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/btnLogout"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="12dp"
+                android:padding="4dp"
                 android:text="LOGOUT"
                 android:textColor="@color/text_secondary"
-                android:textStyle="bold"
                 android:textSize="11sp"
-                android:padding="4dp" />
+                android:textStyle="bold" />
 
         </LinearLayout>
     </LinearLayout>

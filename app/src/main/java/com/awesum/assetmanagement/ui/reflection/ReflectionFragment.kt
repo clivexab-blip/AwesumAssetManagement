@@ -15,7 +15,9 @@ import kotlinx.coroutines.launch
 
 class ReflectionFragment : Fragment(R.layout.fragment_reflection) {
 
-    private val jobId = Constants.CURRENT_JOB_ID
+    private val jobId: Int
+        get() = arguments?.getInt(Constants.EXTRA_JOB_ID) ?: Constants.CURRENT_JOB_ID
+
     private var teamMustReturn: Boolean? = null
 
     private lateinit var etNotes: EditText
