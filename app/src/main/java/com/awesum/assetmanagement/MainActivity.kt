@@ -6,6 +6,7 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.graphics.toColorInt
 import androidx.viewpager2.widget.ViewPager2
+import com.awesum.assetmanagement.R
 import com.awesum.assetmanagement.ui.auth.LoginActivity
 import com.awesum.assetmanagement.ui.order.OrdersActivity
 import com.google.android.gms.auth.api.signin.GoogleSignIn
