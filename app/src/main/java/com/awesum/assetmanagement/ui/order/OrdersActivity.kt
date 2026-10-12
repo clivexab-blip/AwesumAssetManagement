@@ -18,6 +18,7 @@ import com.awesum.assetmanagement.SessionManager
 import com.awesum.assetmanagement.api.ApiClient
 import com.awesum.assetmanagement.model.Order
 import com.awesum.assetmanagement.ui.auth.LoginActivity
+import com.awesum.assetmanagement.ui.summary.JobSummaryActivity
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.firebase.auth.FirebaseAuth
@@ -32,9 +33,10 @@ class OrdersActivity : AppCompatActivity() {
     private lateinit var tvOrderCount: TextView
     private lateinit var btnLogout: TextView
 
-    private val ordersAdapter = OrdersAdapter { order ->
-        openJobForOrder(order)
-    }
+    private val ordersAdapter = OrdersAdapter(
+        onOrderClick = { order -> openJobForOrder(order) },
+        onSummaryClick = { order -> openJobSummaryForOrder(order) }
+    )
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -110,6 +112,31 @@ class OrdersActivity : AppCompatActivity() {
                     startActivity(intent)
                 } else {
                     toast(res.body()?.message ?: "Could not open job for order")
+                }
+            } catch (e: Exception) {
+                toast("Error: ${e.message}")
+            } finally {
+                progressBar.visibility = View.GONE
+            }
+        }
+    }
+
+    private fun openJobSummaryForOrder(order: Order) {
+        progressBar.visibility = View.VISIBLE
+        val userId = SessionManager.getUserId(this)
+
+        lifecycleScope.launch {
+            try {
+                val res = ApiClient.instance.getOrCreateJobForOrder(order.order_id, if (userId > 0) userId else 1)
+                val job = res.body()?.data
+                if (res.isSuccessful && job != null) {
+                    Constants.CURRENT_JOB_ID = job.job_id
+                    val intent = Intent(this@OrdersActivity, JobSummaryActivity::class.java).apply {
+                        putExtra(Constants.EXTRA_JOB_ID, job.job_id)
+                    }
+                    startActivity(intent)
+                } else {
+                    toast(res.body()?.message ?: "Could not open summary for order")
                 }
             } catch (e: Exception) {
                 toast("Error: ${e.message}")

@@ -4,10 +4,10 @@
 // Edit these 4 values to match your phpMyAdmin / MySQL setup
 // (XAMPP/WAMP defaults shown below)
 // =========================================================
-define('DB_HOST', 'localhost');
-define('DB_USER', 'root');
-define('DB_PASS', '');
-define('DB_NAME', 'awesum_db');
+define('DB_HOST', '127.0.0.1');
+define('DB_USER', 'awesumj5e6x4_web');
+define('DB_PASS', '(m$Xa6l+zZaoO@.c');
+define('DB_NAME', 'awesumj5e6x4_awesum');
 
 $conn = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
 

@@ -1,5 +1,7 @@
 package com.awesum.assetmanagement.ui.asset
 
+import android.app.DatePickerDialog
+import android.app.TimePickerDialog
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
@@ -22,7 +24,11 @@ import com.awesum.assetmanagement.ui.add.AddMemberActivity
 import com.awesum.assetmanagement.ui.add.UploadPhotoActivity
 import com.awesum.assetmanagement.ui.photo.PhotoAdapter
 import com.awesum.assetmanagement.ui.team.TeamAdapter
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.launch
+import java.util.Calendar
+import java.util.Locale
 
 class AssetManagementFragment : Fragment(R.layout.fragment_asset_management) {
 
@@ -35,6 +41,7 @@ class AssetManagementFragment : Fragment(R.layout.fragment_asset_management) {
     private lateinit var tvAddress: TextView
     private lateinit var tvStart: TextView
     private lateinit var tvEnd: TextView
+    private lateinit var cardEndDate: View
     private lateinit var tvAssetCount: TextView
     private lateinit var btnAddAsset: TextView
     private lateinit var btnAddMember: TextView
@@ -52,6 +59,7 @@ class AssetManagementFragment : Fragment(R.layout.fragment_asset_management) {
 
     private var allAssets: List<Asset> = emptyList()
     private var activeFilter: String = "All"
+    private var selectedEndTime: String? = null
 
     private lateinit var chipAll: TextView
     private lateinit var chipDispatch: TextView
@@ -67,6 +75,7 @@ class AssetManagementFragment : Fragment(R.layout.fragment_asset_management) {
         tvAddress = view.findViewById(R.id.tvAddress)
         tvStart = view.findViewById(R.id.tvStart)
         tvEnd = view.findViewById(R.id.tvEnd)
+        cardEndDate = view.findViewById(R.id.cardEndDate)
         tvAssetCount = view.findViewById(R.id.tvAssetCount)
         btnAddAsset = view.findViewById(R.id.btnAddAsset)
         btnAddMember = view.findViewById(R.id.btnAddMember)
@@ -91,6 +100,9 @@ class AssetManagementFragment : Fragment(R.layout.fragment_asset_management) {
 
         rvPhotos.layoutManager = GridLayoutManager(requireContext(), 3)
         rvPhotos.adapter = photoAdapter
+
+        cardEndDate.setOnClickListener { pickEndDateAndTime() }
+        tvEnd.setOnClickListener { pickEndDateAndTime() }
 
         chipAll.setOnClickListener { setFilter("All") }
         chipDispatch.setOnClickListener { setFilter("Dispatch") }
@@ -129,6 +141,34 @@ class AssetManagementFragment : Fragment(R.layout.fragment_asset_management) {
         loadAll()
     }
 
+    private fun pickEndDateAndTime() {
+        val calendar = Calendar.getInstance()
+        DatePickerDialog(
+            requireContext(),
+            { _, year, month, dayOfMonth ->
+                TimePickerDialog(
+                    requireContext(),
+                    { _, hourOfDay, minute ->
+                        val formatted = String.format(
+                            Locale.US,
+                            "%04d-%02d-%02d %02d:%02d:00",
+                            year, month + 1, dayOfMonth, hourOfDay, minute
+                        )
+                        selectedEndTime = formatted
+                        tvEnd.text = formatDate(formatted)
+                        toast("End date set to $formatted")
+                    },
+                    calendar.get(Calendar.HOUR_OF_DAY),
+                    calendar.get(Calendar.MINUTE),
+                    true
+                ).show()
+            },
+            calendar.get(Calendar.YEAR),
+            calendar.get(Calendar.MONTH),
+            calendar.get(Calendar.DAY_OF_MONTH)
+        ).show()
+    }
+
     private fun setFilter(filter: String) {
         activeFilter = filter
         val chips = listOf(chipAll to "All", chipDispatch to "Dispatch", chipEquipment to "Equipment", chipVehicle to "Vehicle")
@@ -152,10 +192,11 @@ class AssetManagementFragment : Fragment(R.layout.fragment_asset_management) {
     private fun loadAll() {
         swipeRefresh.isRefreshing = true
         lifecycleScope.launch {
-            loadJob()
-            loadAssets()
-            loadTeam()
-            loadPhotos()
+            val jobDef = async { loadJob() }
+            val assetsDef = async { loadAssets() }
+            val teamDef = async { loadTeam() }
+            val photosDef = async { loadPhotos() }
+            awaitAll(jobDef, assetsDef, teamDef, photosDef)
             swipeRefresh.isRefreshing = false
         }
     }
@@ -169,7 +210,9 @@ class AssetManagementFragment : Fragment(R.layout.fragment_asset_management) {
                 tvJobStatus.text = job.status
                 tvAddress.text = job.installation_address
                 tvStart.text = formatDate(job.start_time)
-                tvEnd.text = job.end_time?.let { formatDate(it) } ?: "—"
+                if (selectedEndTime == null) {
+                    tvEnd.text = job.end_time?.let { formatDate(it) } ?: "— (Tap to set)"
+                }
             }
         } catch (e: Exception) {
             toast("Could not load job: ${e.message}")
@@ -210,7 +253,7 @@ class AssetManagementFragment : Fragment(R.layout.fragment_asset_management) {
     private fun submitJobLog(draft: Boolean) {
         lifecycleScope.launch {
             try {
-                val res = ApiClient.instance.submitJobLog(jobId, if (draft) 1 else 0)
+                val res = ApiClient.instance.submitJobLog(jobId, if (draft) 1 else 0, selectedEndTime)
                 if (res.isSuccessful && res.body()?.success == true) {
                     toast(if (draft) "Draft saved" else "Job log submitted")
                     if (!draft) loadJob()

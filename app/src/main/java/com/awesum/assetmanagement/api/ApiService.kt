@@ -58,6 +58,9 @@ interface ApiService {
         @Part photo: MultipartBody.Part
     ): Response<ApiResponse<Map<String, String>>>
 
+    @GET("get_reflection.php")
+    suspend fun getReflection(@Query("job_id") jobId: Int): Response<ApiResponse<Reflection>>
+
     @FormUrlEncoded
     @POST("save_reflection.php")
     suspend fun saveReflection(
@@ -71,7 +74,8 @@ interface ApiService {
     @POST("submit_job_log.php")
     suspend fun submitJobLog(
         @Field("job_id") jobId: Int,
-        @Field("draft") draft: Int
+        @Field("draft") draft: Int,
+        @Field("end_time") endTime: String? = null
     ): Response<ApiResponse<Any>>
 
     @FormUrlEncoded

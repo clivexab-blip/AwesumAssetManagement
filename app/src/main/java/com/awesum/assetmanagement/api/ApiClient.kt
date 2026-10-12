@@ -9,12 +9,9 @@ import java.util.concurrent.TimeUnit
 object ApiClient {
 
     // ⚠️ BACKEND SETUP:
-    // 1. Ensure XAMPP/WAMP is running MySQL and Apache.
-    // 2. Import 'backend/schema.sql' into phpMyAdmin.
-    // 3. Place the 'backend/' folder contents into your server's web root (e.g., C:/xampp/htdocs/awesum_api/).
-    // 4. Update 'backend/db_config.php' with your database credentials.
-    // 5. Update this BASE_URL below to match your server's IP or '10.0.2.2' for the Android Emulator.
-    private const val BASE_URL = "http://192.168.114.60/awesum_api/"
+    // For Android Emulator, use '10.0.2.2' to connect to localhost on your PC.
+    // For physical devices over Wi-Fi, replace '10.0.2.2' with your PC's LAN IP (e.g. '192.168.114.60').
+    private const val BASE_URL = "https://www.awesumbrands.co.za/awesum_api/"
 
     private val logging = HttpLoggingInterceptor().apply {
         level = HttpLoggingInterceptor.Level.BODY

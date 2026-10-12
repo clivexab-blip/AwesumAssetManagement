@@ -40,6 +40,23 @@ class ReflectionFragment : Fragment(R.layout.fragment_reflection) {
 
         btnSaveDraft.setOnClickListener { save(submitted = false) }
         btnSubmit.setOnClickListener { save(submitted = true) }
+
+        loadReflection()
+    }
+
+    private fun loadReflection() {
+        lifecycleScope.launch {
+            try {
+                val res = ApiClient.instance.getReflection(jobId)
+                val reflection = res.body()?.data
+                if (res.isSuccessful && reflection != null) {
+                    reflection.notes?.let { etNotes.setText(it) }
+                    selectReturn(reflection.team_must_return == 1)
+                }
+            } catch (e: Exception) {
+                // Ignore load error for new reflections
+            }
+        }
     }
 
     private fun selectReturn(mustReturn: Boolean) {

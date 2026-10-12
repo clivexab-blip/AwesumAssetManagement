@@ -9,6 +9,7 @@ import androidx.viewpager2.widget.ViewPager2
 import com.awesum.assetmanagement.R
 import com.awesum.assetmanagement.ui.auth.LoginActivity
 import com.awesum.assetmanagement.ui.order.OrdersActivity
+import com.awesum.assetmanagement.ui.summary.JobSummaryActivity
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.firebase.auth.FirebaseAuth
@@ -34,6 +35,7 @@ class MainActivity : AppCompatActivity() {
         val btnOrders = findViewById<TextView>(R.id.btnOrders)
         val tabAssetMgmt = findViewById<TextView>(R.id.tabAssetMgmt)
         val tabReflection = findViewById<TextView>(R.id.tabReflection)
+        val tabSummary = findViewById<TextView>(R.id.tabSummary)
         val btnLogout = findViewById<TextView>(R.id.btnLogout)
 
         viewPager.adapter = ViewPagerAdapter(this)
@@ -58,6 +60,13 @@ class MainActivity : AppCompatActivity() {
 
         tabAssetMgmt.setOnClickListener { viewPager.currentItem = 0 }
         tabReflection.setOnClickListener { viewPager.currentItem = 1 }
+
+        tabSummary.setOnClickListener {
+            val intent = Intent(this, JobSummaryActivity::class.java).apply {
+                putExtra(Constants.EXTRA_JOB_ID, jobId)
+            }
+            startActivity(intent)
+        }
 
         viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
             override fun onPageSelected(position: Int) {
