@@ -1,5 +1,6 @@
 package com.awesum.assetmanagement.ui.order
 
+import android.util.Base64
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -60,13 +61,29 @@ class OrdersAdapter(
             tvCustomerInfo.text = if (customerEmail.isNotEmpty()) "$customerName ($customerEmail)" else customerName
             tvItemsSummary.text = formatItemsSummary(order.items)
 
-            if (!order.order_image.isNullOrEmpty()) {
-                Glide.with(itemView.context)
-                    .load(order.order_image)
-                    .placeholder(R.drawable.bg_input)
-                    .error(R.drawable.bg_input)
-                    .centerCrop()
-                    .into(ivOrderPicture)
+            val imageUrl = order.order_image
+            if (!imageUrl.isNullOrBlank()) {
+                if (imageUrl.startsWith("data:image")) {
+                    try {
+                        val base64Data = imageUrl.substringAfter(",")
+                        val imageBytes = Base64.decode(base64Data, Base64.DEFAULT)
+                        Glide.with(itemView.context)
+                            .load(imageBytes)
+                            .placeholder(R.drawable.bg_input)
+                            .error(R.drawable.bg_input)
+                            .centerCrop()
+                            .into(ivOrderPicture)
+                    } catch (e: Exception) {
+                        ivOrderPicture.setImageResource(R.drawable.ic_launcher_foreground)
+                    }
+                } else {
+                    Glide.with(itemView.context)
+                        .load(imageUrl)
+                        .placeholder(R.drawable.bg_input)
+                        .error(R.drawable.bg_input)
+                        .centerCrop()
+                        .into(ivOrderPicture)
+                }
             } else {
                 ivOrderPicture.setImageResource(R.drawable.ic_launcher_foreground)
             }
