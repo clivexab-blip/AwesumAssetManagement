@@ -40,6 +40,7 @@ class OrdersAdapter(
         private val ivOrderPicture: ImageView = itemView.findViewById(R.id.ivOrderPicture)
         private val tvCustomerInfo: TextView = itemView.findViewById(R.id.tvCustomerInfo)
         private val tvItemsSummary: TextView = itemView.findViewById(R.id.tvItemsSummary)
+        private val tvProductDetails: TextView = itemView.findViewById(R.id.tvProductDetails)
         private val tvOrderRef: TextView = itemView.findViewById(R.id.tvOrderRef)
         private val badgeOrderStatus: TextView = itemView.findViewById(R.id.badgeOrderStatus)
         private val tvAddress: TextView = itemView.findViewById(R.id.tvAddress)
@@ -57,35 +58,45 @@ class OrdersAdapter(
             tvOrderTotal.text = String.format("R %.2f", order.total)
 
             val customerName = order.customer_name?.ifEmpty { "Guest Customer" } ?: "Guest Customer"
-            val customerEmail = order.customer_email?.ifEmpty { "" } ?: ""
-            tvCustomerInfo.text = if (customerEmail.isNotEmpty()) "$customerName ($customerEmail)" else customerName
-            tvItemsSummary.text = formatItemsSummary(order.items)
+            tvCustomerInfo.text = "Customer: $customerName"
+            tvItemsSummary.text = formatItemsSummary(order)
+
+            val prodDetails = formatProductDetails(order)
+            if (prodDetails.isNotEmpty()) {
+                tvProductDetails.visibility = View.VISIBLE
+                tvProductDetails.text = prodDetails
+            } else {
+                tvProductDetails.visibility = View.GONE
+            }
 
             val imageUrl = order.order_image
             if (!imageUrl.isNullOrBlank()) {
+                ivOrderPicture.setPadding(0, 0, 0, 0)
                 if (imageUrl.startsWith("data:image")) {
                     try {
                         val base64Data = imageUrl.substringAfter(",")
                         val imageBytes = Base64.decode(base64Data, Base64.DEFAULT)
                         Glide.with(itemView.context)
                             .load(imageBytes)
-                            .placeholder(R.drawable.bg_input)
-                            .error(R.drawable.bg_input)
+                            .placeholder(R.drawable.ic_order_placeholder)
+                            .error(R.drawable.ic_order_placeholder)
                             .centerCrop()
                             .into(ivOrderPicture)
                     } catch (e: Exception) {
-                        ivOrderPicture.setImageResource(R.drawable.ic_launcher_foreground)
+                        ivOrderPicture.setImageResource(R.drawable.ic_order_placeholder)
                     }
                 } else {
                     Glide.with(itemView.context)
                         .load(imageUrl)
-                        .placeholder(R.drawable.bg_input)
-                        .error(R.drawable.bg_input)
+                        .placeholder(R.drawable.ic_order_placeholder)
+                        .error(R.drawable.ic_order_placeholder)
                         .centerCrop()
                         .into(ivOrderPicture)
                 }
             } else {
-                ivOrderPicture.setImageResource(R.drawable.ic_launcher_foreground)
+                val pad = (12 * itemView.resources.displayMetrics.density).toInt()
+                ivOrderPicture.setPadding(pad, pad, pad, pad)
+                ivOrderPicture.setImageResource(R.drawable.ic_order_placeholder)
             }
 
             if (!order.job_code.isNullOrEmpty()) {
@@ -105,7 +116,34 @@ class OrdersAdapter(
             btnViewSummary.setOnClickListener { onSummaryClick(order) }
         }
 
-        private fun formatItemsSummary(itemsJson: String?): String {
+        private fun formatProductDetails(order: Order): String {
+            val details = order.items_details
+            if (!details.isNullOrEmpty()) {
+                val detailsList = details.mapNotNull { item ->
+                    val cat = item.category?.ifEmpty { null }
+                    val price = item.price
+                    val desc = item.description?.ifEmpty { null }
+
+                    val parts = mutableListOf<String>()
+                    if (cat != null) parts.add("Category: $cat")
+                    if (price != null && price > 0) parts.add(String.format("Unit Price: R %.2f", price))
+                    if (desc != null) parts.add("Info: $desc")
+
+                    if (parts.isNotEmpty()) parts.joinToString(" • ") else null
+                }
+                if (detailsList.isNotEmpty()) return detailsList.joinToString("\n")
+            }
+            return ""
+        }
+
+        private fun formatItemsSummary(order: Order): String {
+            val details = order.items_details
+            if (!details.isNullOrEmpty()) {
+                val list = details.map { "${it.name ?: "Product"} (x${it.quantity})" }
+                return "Items: " + list.joinToString(", ")
+            }
+
+            val itemsJson = order.items
             if (itemsJson.isNullOrBlank()) return "Items: Website Product Order"
             return try {
                 val jsonArray = JSONArray(itemsJson)
