@@ -1,7 +1,7 @@
 <?php
 require_once 'db_config.php';
 
-// Retrieve orders from website, reading product images from `products` table and quote images from `quotes` table
+// Retrieve ONLY website orders with PAYMENT RECEIVED / COMPLETED payments
 $sql = "SELECT
             o.id AS order_id,
             o.reference_code,
@@ -19,6 +19,11 @@ $sql = "SELECT
         FROM orders o
         LEFT JOIN users u ON u.id = o.user_id
         LEFT JOIN job j ON j.order_id = o.id
+        WHERE LOWER(o.status) NOT LIKE '%pending%'
+          AND LOWER(o.status) NOT LIKE '%awaiting%'
+          AND LOWER(o.status) NOT LIKE '%draft%'
+          AND LOWER(o.status) NOT LIKE '%cancelled%'
+          AND LOWER(o.status) NOT LIKE '%failed%'
         ORDER BY o.id DESC
         LIMIT 500";
 
@@ -120,7 +125,7 @@ if ($result) {
                         $quote_img_raw = $getQuoteImg($q_row);
                     }
 
-                    // Query latest quote for user if item indicates a Quote or no product row found
+                    // Look up latest quote for this user if item name/category indicates a Custom Quote
                     $is_quote_item = (stripos($prod_name, 'quote') !== false) || (stripos($prod_name, 'custom') !== false);
                     if (!$quote_img_raw && ($is_quote_item || !$p_row) && !empty($row['user_id'])) {
                         $uid = intval($row['user_id']);
