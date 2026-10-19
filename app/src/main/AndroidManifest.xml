@@ -33,6 +33,8 @@
 
         <activity android:name=".ui.summary.JobSummaryActivity" android:exported="false" />
 
+        <activity android:name=".ui.settings.SettingsActivity" android:exported="false" />
+
         <activity android:name=".ui.add.AddAssetActivity" android:exported="false" />
         <activity android:name=".ui.add.AddMemberActivity" android:exported="false" />
         <activity android:name=".ui.add.UploadPhotoActivity" android:exported="false" />

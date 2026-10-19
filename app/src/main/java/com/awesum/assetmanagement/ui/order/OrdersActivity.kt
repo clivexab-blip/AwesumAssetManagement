@@ -18,6 +18,7 @@ import com.awesum.assetmanagement.SessionManager
 import com.awesum.assetmanagement.api.ApiClient
 import com.awesum.assetmanagement.model.Order
 import com.awesum.assetmanagement.ui.auth.LoginActivity
+import com.awesum.assetmanagement.ui.settings.SettingsActivity
 import com.awesum.assetmanagement.ui.summary.JobSummaryActivity
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
@@ -31,6 +32,7 @@ class OrdersActivity : AppCompatActivity() {
     private lateinit var tvEmpty: TextView
     private lateinit var progressBar: ProgressBar
     private lateinit var tvOrderCount: TextView
+    private lateinit var btnSettings: View
     private lateinit var btnLogout: View
 
     private val ordersAdapter = OrdersAdapter(
@@ -54,12 +56,16 @@ class OrdersActivity : AppCompatActivity() {
         tvEmpty = findViewById(R.id.tvEmpty)
         progressBar = findViewById(R.id.progressBar)
         tvOrderCount = findViewById(R.id.tvOrderCount)
+        btnSettings = findViewById(R.id.btnSettings)
         btnLogout = findViewById(R.id.btnLogout)
 
         rvOrders.layoutManager = LinearLayoutManager(this)
         rvOrders.adapter = ordersAdapter
 
         swipeRefresh.setOnRefreshListener { loadOrders() }
+        btnSettings.setOnClickListener {
+            startActivity(Intent(this, SettingsActivity::class.java))
+        }
         btnLogout.setOnClickListener { logout() }
 
         loadOrders()

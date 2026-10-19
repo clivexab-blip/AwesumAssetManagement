@@ -80,10 +80,23 @@
                 android:textStyle="bold" />
 
             <ImageView
+                android:id="@+id/btnSettings"
+                android:layout_width="28dp"
+                android:layout_height="28dp"
+                android:layout_marginStart="10dp"
+                android:padding="3dp"
+                android:src="@drawable/ic_settings"
+                android:contentDescription="Settings"
+                tools:ignore="HardcodedText"
+                android:clickable="true"
+                android:focusable="true"
+                app:tint="@color/text_secondary" />
+
+            <ImageView
                 android:id="@+id/btnLogout"
                 android:layout_width="28dp"
                 android:layout_height="28dp"
-                android:layout_marginStart="12dp"
+                android:layout_marginStart="8dp"
                 android:padding="3dp"
                 android:src="@drawable/ic_logout"
                 android:contentDescription="@string/btn_logout"

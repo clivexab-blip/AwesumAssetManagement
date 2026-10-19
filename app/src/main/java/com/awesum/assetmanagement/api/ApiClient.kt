@@ -8,10 +8,8 @@ import java.util.concurrent.TimeUnit
 
 object ApiClient {
 
-    // ⚠️ BACKEND SETUP:
-    // For Android Emulator, use '10.0.2.2' to connect to localhost on your PC.
-    // For physical devices over Wi-Fi, replace '10.0.2.2' with your PC's LAN IP (e.g. '192.168.114.60').
-    private const val BASE_URL = "https://www.awesumbrands.co.za/awesum_api/"
+    // Backend Endpoint
+    const val BASE_URL = "https://www.awesumbrands.co.za/awesum_api/"
 
     private val logging = HttpLoggingInterceptor().apply {
         level = HttpLoggingInterceptor.Level.BODY
