@@ -9,6 +9,7 @@ import android.widget.TextView
 import androidx.core.graphics.toColorInt
 import androidx.recyclerview.widget.RecyclerView
 import com.awesum.assetmanagement.R
+import com.awesum.assetmanagement.api.ApiClient
 import com.awesum.assetmanagement.model.Order
 import com.bumptech.glide.Glide
 import org.json.JSONArray
@@ -91,12 +92,20 @@ class OrdersAdapter(
                 tvProductInfo.visibility = View.GONE
             }
 
-            val imageUrl = order.order_image
-            if (!imageUrl.isNullOrBlank()) {
+            val rawImageUrl = order.order_image?.ifBlank { null }
+                ?: order.items_details?.firstOrNull { !it.image.isNullOrBlank() }?.image
+
+            if (!rawImageUrl.isNullOrBlank()) {
+                val fullImageUrl = when {
+                    rawImageUrl.startsWith("http://") || rawImageUrl.startsWith("https://") || rawImageUrl.startsWith("data:image/") -> rawImageUrl
+                    rawImageUrl.startsWith("/") -> ApiClient.BASE_URL.substringBefore("/awesum_api/") + rawImageUrl
+                    else -> ApiClient.BASE_URL + rawImageUrl
+                }
+
                 ivOrderPicture.setPadding(0, 0, 0, 0)
-                if (imageUrl.startsWith("data:image")) {
+                if (fullImageUrl.startsWith("data:image/")) {
                     try {
-                        val base64Data = imageUrl.substringAfter(",")
+                        val base64Data = fullImageUrl.substringAfter(",")
                         val imageBytes = Base64.decode(base64Data, Base64.DEFAULT)
                         Glide.with(itemView.context)
                             .load(imageBytes)
@@ -109,7 +118,7 @@ class OrdersAdapter(
                     }
                 } else {
                     Glide.with(itemView.context)
-                        .load(imageUrl)
+                        .load(fullImageUrl)
                         .placeholder(R.drawable.ic_order_placeholder)
                         .error(R.drawable.ic_order_placeholder)
                         .centerCrop()
@@ -136,6 +145,26 @@ class OrdersAdapter(
             itemView.setOnClickListener { onOrderClick(order) }
             btnManageJob.setOnClickListener { onOrderClick(order) }
             btnViewSummary.setOnClickListener { onSummaryClick(order) }
+        }
+
+        private fun formatProductDetails(order: Order): String {
+            val details = order.items_details
+            if (!details.isNullOrEmpty()) {
+                val detailsList = details.mapNotNull { item ->
+                    val cat = item.category?.ifEmpty { null }
+                    val price = item.price
+                    val desc = item.description?.ifEmpty { null }
+
+                    val parts = mutableListOf<String>()
+                    if (cat != null) parts.add("Category: $cat")
+                    if (price != null && price > 0) parts.add(String.format("Unit Price: R %.2f", price))
+                    if (desc != null) parts.add("Info: $desc")
+
+                    if (parts.isNotEmpty()) parts.joinToString(" • ") else null
+                }
+                if (detailsList.isNotEmpty()) return detailsList.joinToString("\n")
+            }
+            return ""
         }
 
         private fun formatItemsSummary(order: Order): String {

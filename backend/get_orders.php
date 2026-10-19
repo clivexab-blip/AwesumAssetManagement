@@ -1,7 +1,7 @@
 <?php
 require_once 'db_config.php';
 
-// Retrieve ONLY website orders with PAYMENT RECEIVED / COMPLETED payments
+// Retrieve website orders, including customer info, item details, product images & quote images
 $sql = "SELECT
             o.id AS order_id,
             o.reference_code,
@@ -19,11 +19,6 @@ $sql = "SELECT
         FROM orders o
         LEFT JOIN users u ON u.id = o.user_id
         LEFT JOIN job j ON j.order_id = o.id
-        WHERE LOWER(o.status) NOT LIKE '%pending%'
-          AND LOWER(o.status) NOT LIKE '%awaiting%'
-          AND LOWER(o.status) NOT LIKE '%draft%'
-          AND LOWER(o.status) NOT LIKE '%cancelled%'
-          AND LOWER(o.status) NOT LIKE '%failed%'
         ORDER BY o.id DESC
         LIMIT 500";
 
@@ -31,18 +26,44 @@ $result = $conn->query($sql);
 
 $scheme = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https://' : 'http://');
 $host = $_SERVER['HTTP_HOST'];
-$baseUrl = $scheme . $host . '/';
+$scriptDir = rtrim(dirname($_SERVER['SCRIPT_NAME']), '/\\');
+$apiBaseUrl = $scheme . $host . ($scriptDir === '' || $scriptDir === '/' ? '' : $scriptDir) . '/';
+$rootBaseUrl = $scheme . $host . '/';
 
-function formatImageUrl($rawImage, $baseUrl) {
+function formatImageUrl($rawImage, $apiBaseUrl, $rootBaseUrl) {
     if (empty($rawImage)) return null;
     if (preg_match('~^https?://~i', $rawImage) || preg_match('~^data:image/~i', $rawImage)) {
         return $rawImage;
     }
     $clean = ltrim($rawImage, '/');
-    if (strpos($clean, 'uploads/') === 0 || strpos($clean, 'images/') === 0) {
-        return $baseUrl . $clean;
+    $filename = basename($clean);
+
+    // 1. Check physical existence inside API directory
+    if (file_exists(__DIR__ . '/uploads/images/' . $filename)) {
+        return $apiBaseUrl . 'uploads/images/' . $filename;
     }
-    return $baseUrl . 'uploads/images/' . $clean;
+    if (file_exists(__DIR__ . '/uploads/' . $filename)) {
+        return $apiBaseUrl . 'uploads/' . $filename;
+    }
+
+    // 2. Check physical existence inside Document Root
+    if (isset($_SERVER['DOCUMENT_ROOT'])) {
+        if (file_exists($_SERVER['DOCUMENT_ROOT'] . '/uploads/images/' . $filename)) {
+            return $rootBaseUrl . 'uploads/images/' . $filename;
+        }
+        if (file_exists($_SERVER['DOCUMENT_ROOT'] . '/images/' . $filename)) {
+            return $rootBaseUrl . 'images/' . $filename;
+        }
+        if (file_exists($_SERVER['DOCUMENT_ROOT'] . '/' . $clean)) {
+            return $rootBaseUrl . $clean;
+        }
+    }
+
+    // 3. Fallback constructions
+    if (strpos($clean, 'uploads/') === 0 || strpos($clean, 'images/') === 0) {
+        return $rootBaseUrl . $clean;
+    }
+    return $rootBaseUrl . 'uploads/images/' . $clean;
 }
 
 $getQuoteImg = function($q_row) {
@@ -73,7 +94,7 @@ if ($result) {
 
                     $p_row = null;
 
-                    // 1. Query `products` table by ID or Name
+                    // 1. Query `products` table dynamically by ID or Name
                     if ($prod_id > 0) {
                         $p_stmt = $conn->prepare("SELECT id, name, category, description, price, image, active FROM products WHERE id = ? LIMIT 1");
                         $p_stmt->bind_param('i', $prod_id);
@@ -89,7 +110,7 @@ if ($result) {
                         $p_row2 = $p_stmt2->get_result()->fetch_assoc();
                     }
 
-                    // 2. Query `quotes` table for Custom Quote image
+                    // 2. Custom Quote image lookup from `quotes` table
                     $quote_img_raw = null;
                     if (!empty($item['design_image'])) $quote_img_raw = $item['design_image'];
                     elseif (!empty($item['draft_image'])) $quote_img_raw = $item['draft_image'];
@@ -139,11 +160,11 @@ if ($result) {
                     // Item image priority: Product Image -> Quote Image -> Item JSON Image
                     $itemImgUrl = null;
                     if ($p_row && !empty($p_row['image'])) {
-                        $itemImgUrl = formatImageUrl($p_row['image'], $baseUrl);
+                        $itemImgUrl = formatImageUrl($p_row['image'], $apiBaseUrl, $rootBaseUrl);
                     } elseif (!empty($quote_img_raw)) {
-                        $itemImgUrl = formatImageUrl($quote_img_raw, $baseUrl);
+                        $itemImgUrl = formatImageUrl($quote_img_raw, $apiBaseUrl, $rootBaseUrl);
                     } elseif (!empty($item['image'])) {
-                        $itemImgUrl = formatImageUrl($item['image'], $baseUrl);
+                        $itemImgUrl = formatImageUrl($item['image'], $apiBaseUrl, $rootBaseUrl);
                     }
 
                     if ($first_image === null && !empty($itemImgUrl)) {
