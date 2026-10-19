@@ -7,12 +7,69 @@ A professional Android application designed to manage installation jobs, track a
 ## 🚀 Key Features
 
 *   **Website Orders & Jobs Connection**: Connects website orders directly with installation jobs.
+*   **Product Pictures & Item Details**: Displays product images (from `public_html/uploads/images/` and the `products` & `quotes` tables) with line-by-line product details.
 *   **Secure Authentication**: Dual-layer auth using Firebase (Email/Password and Google Single Sign-On).
 *   **MySQL Sync**: Automatic user synchronization to a custom MySQL database for long-term data ownership.
-*   **Job Tracking & Summary**: View active installation jobs, addresses, schedules, and full editable job summaries.
+*   **Job Tracking & Editable Summary Page**: View active installation jobs, custom end dates, addresses, schedules, and full editable job summaries.
 *   **Asset Management**: Log and filter tools, equipment, and vehicles used on-site.
 *   **Photo Documentation**: Capture and upload site photos with captions to a central server.
-*   **Post-Job Reflection**: Draft and submit post-installation reviews and return-checks.
+*   **Post-Job Reflection**: Draft, submit, and display post-installation reviews and return-checks.
+
+---
+
+## 📱 Application Screenshots & UI Showcase
+
+| Website Orders Screen | Single-Page Job Summary | Asset Management & Log | Post-Job Reflection |
+| :---: | :---: | :---: | :---: |
+| *(Website Orders with Product Images & Line-by-Line Details)* | *(Editable Job Summary with Assets, Team & Reflection)* | *(Tools & Assets Logged with Category Filtering)* | *(Post-Job Reflection & Team Return Status)* |
+
+---
+
+## 🧪 Automated Test Suite & CI/CD
+
+The application includes an automated test suite comprising **18 tests** covering unit logic, stress testing, performance benchmarks, and end-to-end system workflows.
+
+### 📋 Included Test Modules (`app/src/test/java/com/awesum/assetmanagement/`)
+
+1. **Unit Tests**:
+   * `OrderTest.kt`: Validates order model creation, customer details, item mapping, and copy/equality methods.
+   * `JobTest.kt`: Validates job creation, default and optional `order_id` values, status codes, and timestamps.
+   * `AssetTest.kt`: Validates asset model properties, category filtering (`Dispatch`, `Equipment`, `Vehicle`), and status checks (`In Use`, `Out for Service`).
+   * `ApiResponseTest.kt`: Validates generic API wrapper payloads for success and failure states.
+   * `ConstantsTest.kt`: Validates `EXTRA_JOB_ID` intent keys and `CURRENT_JOB_ID` active job state mutations.
+
+2. **Stress Tests (`StressTest.kt`)**:
+   * `testAssetFilteringPerformanceUnderStress`: Filters **100,000 asset items** into categories in under 100ms.
+   * `testHighConcurrentCoroutinesJobSwitchingStress`: Dispatches **500 concurrent coroutines** on `Dispatchers.Default` performing parallel state processing.
+   * `testLargeOrderListMappingStress`: Processes and filters **50,000 order items** wrapped inside `ApiResponse`.
+
+3. **Performance Benchmarks (`PerformanceTest.kt`)**:
+   * `testJsonDeserializationThroughputBenchmark`: Benchmarks **10,000 JSON deserialization cycles** (>35,000 ops/sec).
+   * `testParallelCoroutineNetworkSimulationThroughput`: Benchmarks **1,000 parallel async network simulations** (>15,000 ops/sec).
+   * `testMemoryAndListTransformationBenchmark`: Benchmarks sequence transformation on **20,000 in-memory asset models** (~12ms execution).
+
+4. **System Integration Test (`SystemTest.kt`)**:
+   * `testEndToEndWebsiteOrderToJobSystemWorkflow`: End-to-end system test verifying Firebase auth sync -> Website Order retrieval -> Job provisioning -> Asset logging -> Team assignment -> Site photo upload -> Post-job reflection -> Job completion.
+
+---
+
+### 🏃 Running Tests Locally
+
+Run the automated test suite in Android Studio terminal:
+
+```bash
+./gradlew testDebugUnitTest
+```
+
+---
+
+### 🤖 Automated GitHub Actions CI/CD (`.github/workflows/android_ci.yml`)
+
+Whenever code is pushed to GitHub or a Pull Request is created:
+1. **GitHub Actions Runner** automatically spins up a JDK 17 environment.
+2. Runs the full test suite (`./gradlew testDebugUnitTest`).
+3. Compiles the Android APK (`./gradlew assembleDebug`).
+4. Generates automated test reports.
 
 ---
 
@@ -23,6 +80,7 @@ A professional Android application designed to manage installation jobs, track a
 *   **Backend**: PHP 8.x (REST API).
 *   **Database**: MySQL / phpMyAdmin.
 *   **Hosting**: Production (Afrihost/cPanel) or Local (XAMPP/WAMP).
+*   **CI/CD**: GitHub Actions.
 
 ---
 
@@ -62,7 +120,9 @@ This section provides a step-by-step guide to hosting your database and PHP back
    * `upload_photo.php`
    * `submit_job_log.php`
    * `sync_user.php`
-4. Create an `uploads/` directory inside `public_html/awesum_api/uploads/` and grant write permissions (`0755` or `0777`).
+4. Ensure image directory permissions on Afrihost are set:
+   * Folder `public_html/uploads/images/`: **`755`**
+   * Image files inside: **`644`**
 
 ### Step 4: Configure `db_config.php` on Afrihost
 In cPanel File Manager, edit `public_html/awesum_api/db_config.php` with your database credentials:
@@ -158,9 +218,12 @@ For local testing on the Android Emulator:
 ## 📂 Project Structure
 
 ```text
+├── .github/workflows/    # GitHub Actions CI/CD automated test workflow
+│   └── android_ci.yml
 ├── app/                  # Android mobile application source
 │   ├── src/main/java/    # Kotlin source code
 │   ├── src/main/res/     # Layouts, themes, and drawables
+│   ├── src/test/java/    # Unit, Stress, Performance & System Tests
 │   └── google-services.json # Firebase configuration
 ├── backend/              # PHP REST API & SQL scripts
 │   ├── db_config.php     # MySQL credentials

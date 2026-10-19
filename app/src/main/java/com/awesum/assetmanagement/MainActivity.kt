@@ -2,6 +2,7 @@ package com.awesum.assetmanagement
 
 import android.content.Intent
 import android.os.Bundle
+import android.view.View
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.graphics.toColorInt
@@ -36,7 +37,7 @@ class MainActivity : AppCompatActivity() {
         val tabAssetMgmt = findViewById<TextView>(R.id.tabAssetMgmt)
         val tabReflection = findViewById<TextView>(R.id.tabReflection)
         val tabSummary = findViewById<TextView>(R.id.tabSummary)
-        val btnLogout = findViewById<TextView>(R.id.btnLogout)
+        val btnLogout = findViewById<View>(R.id.btnLogout)
 
         viewPager.adapter = ViewPagerAdapter(this)
         viewPager.isUserInputEnabled = true

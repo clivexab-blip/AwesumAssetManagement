@@ -42,18 +42,18 @@
 
     </LinearLayout>
 
-    <!-- Order Picture + Customer, Items & Product Details Row -->
+    <!-- Order Picture + Customer, Items & Line-by-Line Product Details Row -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
-        android:gravity="center_vertical"
+        android:gravity="top"
         android:orientation="horizontal">
 
         <ImageView
             android:id="@+id/ivOrderPicture"
-            android:layout_width="76dp"
-            android:layout_height="76dp"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
             android:background="@drawable/bg_input"
             android:padding="12dp"
             android:scaleType="fitCenter"
@@ -66,6 +66,7 @@
             android:layout_weight="1"
             android:orientation="vertical">
 
+            <!-- Line 1: Customer Name -->
             <TextView
                 android:id="@+id/tvCustomerInfo"
                 android:layout_width="wrap_content"
@@ -75,6 +76,7 @@
                 android:textSize="13sp"
                 android:textStyle="bold" />
 
+            <!-- Line 2: Items Purchased -->
             <TextView
                 android:id="@+id/tvItemsSummary"
                 android:layout_width="wrap_content"
@@ -84,22 +86,47 @@
                 android:textColor="@color/text_secondary"
                 android:textSize="12sp" />
 
+            <!-- Line 3: Category -->
             <TextView
-                android:id="@+id/tvProductDetails"
+                android:id="@+id/tvCategory"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="3dp"
-                android:text="Category: Business Cards • Unit Price: R 1.00"
+                android:text="Category: Business Cards"
                 android:textColor="@color/accent_orange"
-                android:textSize="11sp"
+                android:textSize="12sp"
                 android:textStyle="bold"
                 android:visibility="gone" />
 
+            <!-- Line 4: Unit Price -->
+            <TextView
+                android:id="@+id/tvUnitPrice"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:text="Unit Price: R 1.00"
+                android:textColor="@color/accent_orange"
+                android:textSize="12sp"
+                android:textStyle="bold"
+                android:visibility="gone" />
+
+            <!-- Line 5: Info / Description -->
+            <TextView
+                android:id="@+id/tvProductInfo"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:text="Info: Product description details"
+                android:textColor="@color/text_secondary"
+                android:textSize="11sp"
+                android:visibility="gone" />
+
+            <!-- Line 6: Address -->
             <TextView
                 android:id="@+id/tvAddress"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="3dp"
+                android:layout_marginTop="4dp"
                 android:text="14 Rivonia Rd, Sandton, 2196"
                 android:textColor="@color/text_secondary"
                 android:textSize="12sp" />

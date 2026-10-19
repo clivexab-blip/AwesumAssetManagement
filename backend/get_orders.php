@@ -1,7 +1,7 @@
 <?php
 require_once 'db_config.php';
 
-// Retrieve orders from website, dynamically reading full product details from the `products` table
+// Retrieve ONLY website orders with COMPLETED/PAID payments
 $sql = "SELECT
             o.id AS order_id,
             o.reference_code,
@@ -19,6 +19,10 @@ $sql = "SELECT
         FROM orders o
         LEFT JOIN users u ON u.id = o.user_id
         LEFT JOIN job j ON j.order_id = o.id
+        WHERE LOWER(o.status) NOT LIKE '%pending%'
+          AND LOWER(o.status) NOT LIKE '%awaiting%'
+          AND LOWER(o.status) NOT LIKE '%draft%'
+          AND LOWER(o.status) NOT LIKE '%cancelled%'
         ORDER BY o.id DESC
         LIMIT 500";
 
@@ -40,6 +44,14 @@ function formatImageUrl($rawImage, $baseUrl) {
     return $baseUrl . 'uploads/images/' . $clean;
 }
 
+$getQuoteImg = function($q_row) {
+    if (!$q_row) return null;
+    if (!empty($q_row['design_image'])) return $q_row['design_image'];
+    if (!empty($q_row['draft_image'])) return $q_row['draft_image'];
+    if (!empty($q_row['client_idea_image'])) return $q_row['client_idea_image'];
+    return null;
+};
+
 $orders = [];
 if ($result) {
     while ($row = $result->fetch_assoc()) {
@@ -60,7 +72,7 @@ if ($result) {
 
                     $p_row = null;
 
-                    // Query `products` table dynamically by ID or Name
+                    // 1. Query `products` table dynamically by ID or Name
                     if ($prod_id > 0) {
                         $p_stmt = $conn->prepare("SELECT id, name, category, description, price, image, active FROM products WHERE id = ? LIMIT 1");
                         $p_stmt->bind_param('i', $prod_id);
@@ -73,36 +85,77 @@ if ($result) {
                         $like_name = '%' . $prod_name . '%';
                         $p_stmt2->bind_param('ss', $prod_name, $like_name);
                         $p_stmt2->execute();
-                        $p_row = $p_stmt2->get_result()->fetch_assoc();
+                        $p_row2 = $p_stmt2->get_result()->fetch_assoc();
+                    }
+
+                    // 2. Custom Quote image lookup from `quotes` table
+                    $quote_img_raw = null;
+                    if (!empty($item['design_image'])) $quote_img_raw = $item['design_image'];
+                    elseif (!empty($item['draft_image'])) $quote_img_raw = $item['draft_image'];
+                    elseif (!empty($item['client_idea_image'])) $quote_img_raw = $item['client_idea_image'];
+
+                    $quote_id = !empty($item['quote_id']) ? intval($item['quote_id']) : 0;
+                    $quote_ref = !empty($item['quote_ref']) ? trim($item['quote_ref']) : (!empty($item['reference_code']) ? trim($item['reference_code']) : '');
+
+                    if (!$quote_img_raw && $quote_id > 0) {
+                        $q_stmt = $conn->prepare("SELECT design_image, draft_image, client_idea_image FROM quotes WHERE id = ? LIMIT 1");
+                        $q_stmt->bind_param('i', $quote_id);
+                        $q_stmt->execute();
+                        $q_row = $q_stmt->get_result()->fetch_assoc();
+                        $quote_img_raw = $getQuoteImg($q_row);
+                    }
+
+                    if (!$quote_img_raw && !empty($quote_ref)) {
+                        $q_stmt = $conn->prepare("SELECT design_image, draft_image, client_idea_image FROM quotes WHERE reference_code = ? LIMIT 1");
+                        $q_stmt->bind_param('s', $quote_ref);
+                        $q_stmt->execute();
+                        $q_row = $q_stmt->get_result()->fetch_assoc();
+                        $quote_img_raw = $getQuoteImg($q_row);
+                    }
+
+                    // Look up latest quote for this user if item name/category indicates a Custom Quote
+                    $is_quote_item = (stripos($prod_name, 'quote') !== false) || (stripos($prod_name, 'custom') !== false);
+                    if (!$quote_img_raw && $is_quote_item && !empty($row['user_id'])) {
+                        $uid = intval($row['user_id']);
+                        $q_stmt2 = $conn->prepare("SELECT design_image, draft_image, client_idea_image FROM quotes WHERE user_id = ? ORDER BY id DESC LIMIT 1");
+                        $q_stmt2->bind_param('i', $uid);
+                        $q_stmt2->execute();
+                        $q_row2 = $q_stmt2->get_result()->fetch_assoc();
+                        $quote_img_raw = $getQuoteImg($q_row2);
+                    }
+
+                    // Item image priority: Product Image -> Quote Image -> Item JSON Image
+                    $itemImgUrl = null;
+                    if ($p_row && !empty($p_row['image'])) {
+                        $itemImgUrl = formatImageUrl($p_row['image'], $baseUrl);
+                    } elseif (!empty($quote_img_raw)) {
+                        $itemImgUrl = formatImageUrl($quote_img_raw, $baseUrl);
+                    } elseif (!empty($item['image'])) {
+                        $itemImgUrl = formatImageUrl($item['image'], $baseUrl);
+                    }
+
+                    if ($first_image === null && !empty($itemImgUrl)) {
+                        $first_image = $itemImgUrl;
                     }
 
                     if ($p_row) {
-                        $imgUrl = formatImageUrl($p_row['image'], $baseUrl);
-                        if ($first_image === null && !empty($imgUrl)) {
-                            $first_image = $imgUrl;
-                        }
                         $items_details[] = [
                             'product_id'  => intval($p_row['id']),
                             'name'        => $p_row['name'],
                             'category'    => $p_row['category'],
                             'description' => $p_row['description'],
                             'price'       => floatval($p_row['price']),
-                            'image'       => $imgUrl,
+                            'image'       => $itemImgUrl,
                             'quantity'    => $qty
                         ];
                     } else {
-                        // Fallback item details if product row not found in products table
-                        $imgUrl = !empty($item['image']) ? formatImageUrl($item['image'], $baseUrl) : null;
-                        if ($first_image === null && !empty($imgUrl)) {
-                            $first_image = $imgUrl;
-                        }
                         $items_details[] = [
                             'product_id'  => $prod_id > 0 ? $prod_id : null,
-                            'name'        => !empty($prod_name) ? $prod_name : 'Custom Product',
-                            'category'    => 'General',
+                            'name'        => !empty($prod_name) ? $prod_name : 'Custom Quote',
+                            'category'    => 'Custom Quote',
                             'description' => null,
                             'price'       => isset($item['price']) ? floatval($item['price']) : 0.0,
-                            'image'       => $imgUrl,
+                            'image'       => $itemImgUrl,
                             'quantity'    => $qty
                         ];
                     }

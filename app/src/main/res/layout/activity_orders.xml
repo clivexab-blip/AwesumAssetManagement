@@ -28,15 +28,16 @@
             android:textSize="14sp"
             android:textStyle="bold" />
 
-        <TextView
+        <ImageView
             android:id="@+id/btnLogout"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:padding="4dp"
-            android:text="LOGOUT"
-            android:textColor="@color/text_secondary"
-            android:textSize="11sp"
-            android:textStyle="bold" />
+            android:layout_width="28dp"
+            android:layout_height="28dp"
+            android:padding="3dp"
+            android:src="@drawable/ic_logout"
+            android:contentDescription="Logout"
+            android:clickable="true"
+            android:focusable="true"
+            app:tint="@color/text_secondary" />
 
     </LinearLayout>
 

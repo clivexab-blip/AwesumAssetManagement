@@ -31,7 +31,7 @@ class OrdersActivity : AppCompatActivity() {
     private lateinit var tvEmpty: TextView
     private lateinit var progressBar: ProgressBar
     private lateinit var tvOrderCount: TextView
-    private lateinit var btnLogout: TextView
+    private lateinit var btnLogout: View
 
     private val ordersAdapter = OrdersAdapter(
         onOrderClick = { order -> openJobForOrder(order) },

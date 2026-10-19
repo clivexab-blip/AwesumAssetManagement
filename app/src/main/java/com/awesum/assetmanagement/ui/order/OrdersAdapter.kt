@@ -40,7 +40,9 @@ class OrdersAdapter(
         private val ivOrderPicture: ImageView = itemView.findViewById(R.id.ivOrderPicture)
         private val tvCustomerInfo: TextView = itemView.findViewById(R.id.tvCustomerInfo)
         private val tvItemsSummary: TextView = itemView.findViewById(R.id.tvItemsSummary)
-        private val tvProductDetails: TextView = itemView.findViewById(R.id.tvProductDetails)
+        private val tvCategory: TextView = itemView.findViewById(R.id.tvCategory)
+        private val tvUnitPrice: TextView = itemView.findViewById(R.id.tvUnitPrice)
+        private val tvProductInfo: TextView = itemView.findViewById(R.id.tvProductInfo)
         private val tvOrderRef: TextView = itemView.findViewById(R.id.tvOrderRef)
         private val badgeOrderStatus: TextView = itemView.findViewById(R.id.badgeOrderStatus)
         private val tvAddress: TextView = itemView.findViewById(R.id.tvAddress)
@@ -61,12 +63,32 @@ class OrdersAdapter(
             tvCustomerInfo.text = "Customer: $customerName"
             tvItemsSummary.text = formatItemsSummary(order)
 
-            val prodDetails = formatProductDetails(order)
-            if (prodDetails.isNotEmpty()) {
-                tvProductDetails.visibility = View.VISIBLE
-                tvProductDetails.text = prodDetails
+            val detail = order.items_details?.firstOrNull()
+            if (detail != null) {
+                if (!detail.category.isNullOrBlank()) {
+                    tvCategory.visibility = View.VISIBLE
+                    tvCategory.text = "Category: ${detail.category}"
+                } else {
+                    tvCategory.visibility = View.GONE
+                }
+
+                if (detail.price != null && detail.price > 0) {
+                    tvUnitPrice.visibility = View.VISIBLE
+                    tvUnitPrice.text = String.format("Unit Price: R %.2f", detail.price)
+                } else {
+                    tvUnitPrice.visibility = View.GONE
+                }
+
+                if (!detail.description.isNullOrBlank()) {
+                    tvProductInfo.visibility = View.VISIBLE
+                    tvProductInfo.text = "Info: ${detail.description}"
+                } else {
+                    tvProductInfo.visibility = View.GONE
+                }
             } else {
-                tvProductDetails.visibility = View.GONE
+                tvCategory.visibility = View.GONE
+                tvUnitPrice.visibility = View.GONE
+                tvProductInfo.visibility = View.GONE
             }
 
             val imageUrl = order.order_image
@@ -114,26 +136,6 @@ class OrdersAdapter(
             itemView.setOnClickListener { onOrderClick(order) }
             btnManageJob.setOnClickListener { onOrderClick(order) }
             btnViewSummary.setOnClickListener { onSummaryClick(order) }
-        }
-
-        private fun formatProductDetails(order: Order): String {
-            val details = order.items_details
-            if (!details.isNullOrEmpty()) {
-                val detailsList = details.mapNotNull { item ->
-                    val cat = item.category?.ifEmpty { null }
-                    val price = item.price
-                    val desc = item.description?.ifEmpty { null }
-
-                    val parts = mutableListOf<String>()
-                    if (cat != null) parts.add("Category: $cat")
-                    if (price != null && price > 0) parts.add(String.format("Unit Price: R %.2f", price))
-                    if (desc != null) parts.add("Info: $desc")
-
-                    if (parts.isNotEmpty()) parts.joinToString(" • ") else null
-                }
-                if (detailsList.isNotEmpty()) return detailsList.joinToString("\n")
-            }
-            return ""
         }
 
         private fun formatItemsSummary(order: Order): String {
