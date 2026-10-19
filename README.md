@@ -4,6 +4,15 @@ A professional Android application designed to manage installation jobs, track f
 
 🌐 **Official Website Link**: [https://www.awesumbrands.co.za/](https://www.awesumbrands.co.za/)
 
+> [!IMPORTANT]
+> **Key Production & Integration Information**:
+> * **Live Website Platform**: [https://www.awesumbrands.co.za/](https://www.awesumbrands.co.za/)
+> * **Production REST API Endpoint**: `https://www.awesumbrands.co.za/awesum_api/`
+> * **Hosting Environment**: Production backend hosted on **Afrihost cPanel** using PHP 8.x and MySQL (`awesum_combined` / `awesum_db`).
+> * **Image & Media Storage**: All product catalog pictures and custom quote design photos are stored in `public_html/uploads/images/`.
+> * **Order Payment Rule**: The mobile application strictly displays website orders with **Payment Received / Completed** status (`Payment received`, `Paid`, `Payment completed`).
+> * **Automated Test Suite**: Features **18 automated tests** (Unit, Stress, Performance, System Integration) executed continuously via GitHub Actions (`.github/workflows/android_ci.yml`).
+
 ---
 
 ## 📂 Project File Structure
