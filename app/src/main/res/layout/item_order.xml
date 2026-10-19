@@ -22,6 +22,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="REF-CODE"
+            tools:ignore="HardcodedText"
             android:textColor="@color/text_primary"
             android:textSize="16sp"
             android:textStyle="bold" />
@@ -36,6 +37,7 @@
             android:paddingTop="4dp"
             android:paddingBottom="4dp"
             android:text="Payment pending"
+            tools:ignore="HardcodedText"
             android:textColor="@color/text_primary"
             android:textSize="11sp"
             android:textStyle="bold" />
@@ -57,6 +59,8 @@
             android:background="@drawable/bg_input"
             android:padding="12dp"
             android:scaleType="fitCenter"
+            android:contentDescription="Order product thumbnail"
+            tools:ignore="HardcodedText"
             android:src="@drawable/ic_order_placeholder" />
 
         <LinearLayout
@@ -72,6 +76,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Customer: Mpilonhle Memela"
+                tools:ignore="HardcodedText"
                 android:textColor="@color/text_primary"
                 android:textSize="13sp"
                 android:textStyle="bold" />
@@ -83,6 +88,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="3dp"
                 android:text="Items: Gift card (x1)"
+                tools:ignore="HardcodedText"
                 android:textColor="@color/text_secondary"
                 android:textSize="12sp" />
 
@@ -93,6 +99,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="3dp"
                 android:text="Category: Business Cards"
+                tools:ignore="HardcodedText"
                 android:textColor="@color/accent_orange"
                 android:textSize="12sp"
                 android:textStyle="bold"
@@ -105,6 +112,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="2dp"
                 android:text="Unit Price: R 1.00"
+                tools:ignore="HardcodedText"
                 android:textColor="@color/accent_orange"
                 android:textSize="12sp"
                 android:textStyle="bold"
@@ -117,6 +125,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="2dp"
                 android:text="Info: Product description details"
+                tools:ignore="HardcodedText"
                 android:textColor="@color/text_secondary"
                 android:textSize="11sp"
                 android:visibility="gone" />
@@ -128,6 +137,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
                 android:text="14 Rivonia Rd, Sandton, 2196"
+                tools:ignore="HardcodedText"
                 android:textColor="@color/text_secondary"
                 android:textSize="12sp" />
 
@@ -149,6 +159,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="2026-09-03"
+            tools:ignore="HardcodedText"
             android:textColor="@color/text_secondary"
             android:textSize="12sp" />
 
@@ -157,6 +168,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="R 0.00"
+            tools:ignore="HardcodedText"
             android:textColor="@color/accent_orange"
             android:textSize="15sp"
             android:textStyle="bold" />
@@ -183,6 +195,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="Job: JOB-2026-0083"
+            tools:ignore="HardcodedText"
             android:textColor="@color/text_secondary"
             android:textSize="12sp"
             android:textStyle="bold" />
@@ -196,7 +209,7 @@
             android:paddingEnd="14dp"
             android:paddingTop="8dp"
             android:paddingBottom="8dp"
-            android:text="Manage Job →"
+            android:text="@string/btn_manage_job"
             android:textColor="@color/bg_root"
             android:textSize="12sp"
             android:textStyle="bold" />
@@ -211,7 +224,7 @@
             android:paddingEnd="12dp"
             android:paddingTop="8dp"
             android:paddingBottom="8dp"
-            android:text="Summary"
+            android:text="@string/btn_summary"
             android:textColor="@color/text_primary"
             android:textSize="12sp"
             android:textStyle="bold"

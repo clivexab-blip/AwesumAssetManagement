@@ -86,4 +86,28 @@
     <string name="label_caption">CAPTION (OPTIONAL)</string>
     <string name="hint_caption">e.g. North wall — completed, paste dried</string>
     <string name="btn_save_photo">Save Photo</string>
+
+    <!-- Orders Activity & Item -->
+    <string name="title_orders_header">AWESUM | WEBSITE ORDERS</string>
+    <string name="title_website_orders">Website Orders</string>
+    <string name="subtitle_orders_info">Select an order to view or manage its installation job</string>
+    <string name="msg_no_orders">No website orders found</string>
+    <string name="btn_orders_back">← ORDERS</string>
+    <string name="btn_back">← BACK</string>
+    <string name="btn_manage_job">Manage Job →</string>
+    <string name="btn_start_job">Start Job →</string>
+    <string name="btn_summary">Summary</string>
+
+    <!-- Job Summary -->
+    <string name="title_job_summary">AWESUM | JOB SUMMARY</string>
+    <string name="title_tools_assets_logged">Tools &amp; Assets Logged</string>
+    <string name="title_post_job_reflection">Post-Job Reflection</string>
+    <string name="subtitle_reflection_info">Reflect on process, execution, and team status</string>
+    <string name="label_saved_reflection_notes">SAVED REFLECTION NOTES</string>
+    <string name="label_edit_reflection_notes">Edit Reflection Notes</string>
+    <string name="btn_save_update_reflection">Save &amp; Update Reflection</string>
+    <string name="btn_return_to_orders">Return to Orders</string>
+    <string name="btn_logout">Logout</string>
+    <string name="btn_toggle_mark_completed">Mark Job as Completed</string>
+    <string name="btn_toggle_completed_reopen">Job Status: Completed (Click to Re-Open)</string>
 </resources>

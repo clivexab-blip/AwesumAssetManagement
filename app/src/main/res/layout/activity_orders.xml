@@ -23,7 +23,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="AWESUM | WEBSITE ORDERS"
+            android:text="@string/title_orders_header"
             android:textColor="@color/accent_orange"
             android:textSize="14sp"
             android:textStyle="bold" />
@@ -34,7 +34,7 @@
             android:layout_height="28dp"
             android:padding="3dp"
             android:src="@drawable/ic_logout"
-            android:contentDescription="Logout"
+            android:contentDescription="@string/btn_logout"
             android:clickable="true"
             android:focusable="true"
             app:tint="@color/text_secondary" />
@@ -59,7 +59,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Website Orders"
+            android:text="@string/title_website_orders"
             android:textColor="@color/text_primary"
             android:textSize="20sp"
             android:textStyle="bold" />
@@ -69,7 +69,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="2dp"
-            android:text="Select an order to view or manage its installation job"
+            android:text="@string/subtitle_orders_info"
             android:textColor="@color/text_secondary"
             android:textSize="12sp" />
 
@@ -100,7 +100,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:text="No website orders found"
+                android:text="@string/msg_no_orders"
                 android:textColor="@color/text_secondary"
                 android:textSize="14sp"
                 android:visibility="gone" />

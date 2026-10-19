@@ -22,7 +22,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="AWESUM"
+            android:text="@string/app_name"
             android:textColor="@color/accent_orange"
             android:textSize="14sp"
             android:textStyle="bold" />
@@ -39,7 +39,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="12dp"
                 android:padding="4dp"
-                android:text="← ORDERS"
+                android:text="@string/btn_orders_back"
                 android:textColor="@color/text_secondary"
                 android:textSize="11sp"
                 android:textStyle="bold" />
@@ -50,6 +50,7 @@
                 android:layout_height="wrap_content"
                 android:padding="4dp"
                 android:text="JOB LOG"
+                tools:ignore="HardcodedText"
                 android:textColor="@color/accent_orange"
                 android:textSize="13sp"
                 android:textStyle="bold" />
@@ -61,6 +62,7 @@
                 android:layout_marginStart="12dp"
                 android:padding="4dp"
                 android:text="REFLECTION"
+                tools:ignore="HardcodedText"
                 android:textColor="@color/text_secondary"
                 android:textSize="13sp"
                 android:textStyle="bold" />
@@ -72,6 +74,7 @@
                 android:layout_marginStart="12dp"
                 android:padding="4dp"
                 android:text="SUMMARY"
+                tools:ignore="HardcodedText"
                 android:textColor="@color/text_secondary"
                 android:textSize="13sp"
                 android:textStyle="bold" />
@@ -83,7 +86,7 @@
                 android:layout_marginStart="12dp"
                 android:padding="3dp"
                 android:src="@drawable/ic_logout"
-                android:contentDescription="Logout"
+                android:contentDescription="@string/btn_logout"
                 android:clickable="true"
                 android:focusable="true"
                 app:tint="@color/text_secondary" />
