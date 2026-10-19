@@ -1,7 +1,7 @@
 <?php
 require_once 'db_config.php';
 
-// Retrieve ONLY website orders with COMPLETED/PAID payments
+// Retrieve orders from website, reading product images from `products` table and quote images from `quotes` table
 $sql = "SELECT
             o.id AS order_id,
             o.reference_code,
@@ -19,10 +19,6 @@ $sql = "SELECT
         FROM orders o
         LEFT JOIN users u ON u.id = o.user_id
         LEFT JOIN job j ON j.order_id = o.id
-        WHERE LOWER(o.status) NOT LIKE '%pending%'
-          AND LOWER(o.status) NOT LIKE '%awaiting%'
-          AND LOWER(o.status) NOT LIKE '%draft%'
-          AND LOWER(o.status) NOT LIKE '%cancelled%'
         ORDER BY o.id DESC
         LIMIT 500";
 
@@ -72,7 +68,7 @@ if ($result) {
 
                     $p_row = null;
 
-                    // 1. Query `products` table dynamically by ID or Name
+                    // 1. Query `products` table by ID or Name
                     if ($prod_id > 0) {
                         $p_stmt = $conn->prepare("SELECT id, name, category, description, price, image, active FROM products WHERE id = ? LIMIT 1");
                         $p_stmt->bind_param('i', $prod_id);
@@ -88,13 +84,24 @@ if ($result) {
                         $p_row2 = $p_stmt2->get_result()->fetch_assoc();
                     }
 
-                    // 2. Custom Quote image lookup from `quotes` table
+                    // 2. Query `quotes` table for Custom Quote image
                     $quote_img_raw = null;
                     if (!empty($item['design_image'])) $quote_img_raw = $item['design_image'];
                     elseif (!empty($item['draft_image'])) $quote_img_raw = $item['draft_image'];
                     elseif (!empty($item['client_idea_image'])) $quote_img_raw = $item['client_idea_image'];
 
                     $quote_id = !empty($item['quote_id']) ? intval($item['quote_id']) : 0;
+                    if ($quote_id == 0 && !empty($item['id'])) {
+                        $q_chk_id = intval($item['id']);
+                        $q_stmt_chk = $conn->prepare("SELECT design_image, draft_image, client_idea_image FROM quotes WHERE id = ? LIMIT 1");
+                        $q_stmt_chk->bind_param('i', $q_chk_id);
+                        $q_stmt_chk->execute();
+                        $q_row_chk = $q_stmt_chk->get_result()->fetch_assoc();
+                        if ($q_row_chk) {
+                            $quote_img_raw = $getQuoteImg($q_row_chk);
+                        }
+                    }
+
                     $quote_ref = !empty($item['quote_ref']) ? trim($item['quote_ref']) : (!empty($item['reference_code']) ? trim($item['reference_code']) : '');
 
                     if (!$quote_img_raw && $quote_id > 0) {
@@ -113,9 +120,9 @@ if ($result) {
                         $quote_img_raw = $getQuoteImg($q_row);
                     }
 
-                    // Look up latest quote for this user if item name/category indicates a Custom Quote
+                    // Query latest quote for user if item indicates a Quote or no product row found
                     $is_quote_item = (stripos($prod_name, 'quote') !== false) || (stripos($prod_name, 'custom') !== false);
-                    if (!$quote_img_raw && $is_quote_item && !empty($row['user_id'])) {
+                    if (!$quote_img_raw && ($is_quote_item || !$p_row) && !empty($row['user_id'])) {
                         $uid = intval($row['user_id']);
                         $q_stmt2 = $conn->prepare("SELECT design_image, draft_image, client_idea_image FROM quotes WHERE user_id = ? ORDER BY id DESC LIMIT 1");
                         $q_stmt2->bind_param('i', $uid);
