@@ -81,7 +81,11 @@ class OrdersActivity : AppCompatActivity() {
         lifecycleScope.launch {
             try {
                 val res = ApiClient.instance.getOrders()
-                val orders = res.body()?.data ?: emptyList()
+                val rawOrders = res.body()?.data ?: emptyList()
+                val orders = rawOrders.filter { order ->
+                    val status = order.order_status.lowercase()
+                    !status.contains("pending") && !status.contains("awaiting") && !status.contains("draft") && !status.contains("cancelled") && !status.contains("failed")
+                }
                 if (res.isSuccessful) {
                     ordersAdapter.submitList(orders)
                     if (orders.isEmpty()) {

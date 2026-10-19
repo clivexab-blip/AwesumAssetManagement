@@ -1,7 +1,7 @@
 <?php
 require_once 'db_config.php';
 
-// Retrieve website orders, including customer info, item details, product images & quote images
+// Retrieve ONLY website orders with PAYMENT RECEIVED / COMPLETED payments
 $sql = "SELECT
             o.id AS order_id,
             o.reference_code,
@@ -19,6 +19,11 @@ $sql = "SELECT
         FROM orders o
         LEFT JOIN users u ON u.id = o.user_id
         LEFT JOIN job j ON j.order_id = o.id
+        WHERE LOWER(o.status) NOT LIKE '%pending%'
+          AND LOWER(o.status) NOT LIKE '%awaiting%'
+          AND LOWER(o.status) NOT LIKE '%draft%'
+          AND LOWER(o.status) NOT LIKE '%cancelled%'
+          AND LOWER(o.status) NOT LIKE '%failed%'
         ORDER BY o.id DESC
         LIMIT 500";
 
