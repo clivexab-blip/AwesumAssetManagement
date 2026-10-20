@@ -303,6 +303,19 @@ Whenever code is pushed to GitHub or a Pull Request is created:
 3. Compiles the Android APK (`./gradlew assembleDebug`).
 4. Generates automated test reports.
 
+#### ✅ Live GitHub Actions CI/CD Verification (`run #4`)
+
+| CI/CD Metric | Live GitHub Actions Value | Status |
+| :--- | :--- | :---: |
+| **Repository** | `clivexab-blip/AwesumAssetManagement` | ✅ Passed |
+| **Workflow Name** | `Android CI & Automated Test Suite` | ✅ Passed |
+| **Trigger Event** | `push` (`master` branch) | ✅ Passed |
+| **Requested Task** | `testDebugUnitTest` | ✅ Passed |
+| **Gradle Version** | `9.8.1` | ✅ Passed |
+| **Total CI Duration** | `2m 14s` | ✅ Passed |
+| **Test Outcome** | **18 Passed / 0 Failed** | ✅ **SUCCESS** |
+| **Test Artifact** | `unit-test-results` | ✅ Uploaded |
+
 ---
 
 ## 🛠️ Technology Stack
