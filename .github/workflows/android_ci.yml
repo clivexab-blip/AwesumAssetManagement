@@ -24,13 +24,6 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v3
 
-      - name: Ensure Executable Wrapper
-        run: |
-          if [ ! -f gradlew ]; then
-            gradle wrapper
-          fi
-          chmod +x gradlew || true
-
       - name: Run Automated Test Suite (Unit, Stress, Performance, System)
         run: gradle testDebugUnitTest --stacktrace
 
