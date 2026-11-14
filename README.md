@@ -2,7 +2,7 @@
 
 A professional Android application designed to manage installation jobs, track field assets (tools, vehicles, and equipment), and document completed work through site photos. The application seamlessly synchronizes website orders, Firebase Authentication, and a custom PHP/MySQL backend hosted on Afrihost.
 
-🌐 **Official Website**: [https://www.awesumbrands.co.za/](https://www.awesumbrands.co.za/)
+**Official Website**: [https://www.awesumbrands.co.za/](https://www.awesumbrands.co.za/)
 
 > [!IMPORTANT]
 > **Key Production & Integration Summary**:
@@ -15,7 +15,7 @@ A professional Android application designed to manage installation jobs, track f
 
 ---
 
-## 🚀 Key Features
+## Key Features
 
 *   **Website Orders & Jobs Connection**: Connects website orders directly with installation jobs.
 *   **Product Pictures & Item Details**: Displays product images (from `public_html/uploads/images/` and the `products` & `quotes` tables) with line-by-line product details.
@@ -28,7 +28,7 @@ A professional Android application designed to manage installation jobs, track f
 
 ---
 
-## 📂 Project File Structure
+## Project File Structure
 
 ```text
 AwesumApp_Clean/
@@ -123,7 +123,7 @@ AwesumApp_Clean/
 
 ---
 
-## 🔌 List of REST APIs Used
+## List of REST APIs Used
 
 | Endpoint File | HTTP Method | Input Parameters | Description / Purpose |
 | :--- | :---: | :--- | :--- |
@@ -143,7 +143,7 @@ AwesumApp_Clean/
 
 ---
 
-## 🗄️ Database Structure & Tables Used in Database
+## Database Structure & Tables Used in Database
 
 The single unified MySQL database (`awesum_combined` / `awesum_db`) powers both the website ([https://www.awesumbrands.co.za/](https://www.awesumbrands.co.za/)) and the Android mobile application.
 
@@ -255,13 +255,112 @@ erDiagram
     }
 ```
 
+### Table Details
+
+#### 1. `orders` Table (Website Orders)
+Stores orders placed on the website ([https://www.awesumbrands.co.za/](https://www.awesumbrands.co.za/)).
+* **`id`**: Primary key (`bigint(20)`).
+* **`reference_code`**: Unique reference code e.g. `ORD-B81C3AE8`.
+* **`user_id`**: Foreign key to `users(id)`.
+* **`items`**: JSON payload of order items (product IDs, quantities, custom quote tags).
+* **`total`**: Order total price (`decimal(12,2)`).
+* **`address`**: Delivery/installation address.
+* **`status`**: Order payment status e.g. `Payment received`, `Paid`.
+* **`created_at`**: Creation timestamp.
+
+#### 2. `products` Table (Website Product Catalog)
+Stores product catalog listings and image references.
+* **`id`**: Primary key (`bigint(20)`).
+* **`name`**: Product name e.g. `business cards`, `T-Shirts`.
+* **`category`**: Category e.g. `Business Cards`, `T-Shirts`.
+* **`description`**: Detailed product description text.
+* **`price`**: Unit price (`decimal(12,2)`).
+* **`image`**: Product image filename/path stored in `public_html/uploads/images/`.
+* **`active`**: Active state (`1` = active, `0` = inactive).
+
+#### 3. `quotes` Table (Custom Quote Requests)
+Stores custom quote requests and design images submitted by clients.
+* **`id`**: Primary key (`bigint(20)`).
+* **`reference_code`**: Quote reference code.
+* **`user_id`**: Foreign key to `users(id)`.
+* **`description`**: Quote description.
+* **`category`**: Category e.g. `Custom Quote`.
+* **`status`**: Quote status e.g. `Awaiting Review`, `Approved`.
+* **`design_image`**, **`draft_image`**, **`client_idea_image`**: Custom quote design image filenames stored in `public_html/uploads/images/`.
+
+#### 4. `user` Table (Mobile Installer Accounts)
+Stores field installer accounts synchronized with Firebase Authentication.
+* **`user_id`**: Primary key (`int(11)`).
+* **`name`**: Installer full name e.g. `Sipho Dlamini`.
+* **`role`**: Installer role e.g. `Lead Installer`.
+* **`email`**: Unique email address.
+* **`firebase_uid`**: Firebase Authentication UID.
+* **`auth_provider`**: Sign-in provider (`password` or `google.com`).
+
+#### 5. `job` Table (Field Installation Jobs)
+Stores installation jobs linked directly to website orders (`order_id`).
+* **`job_id`**: Primary key (`int(11)`).
+* **`job_code`**: Unique job code e.g. `JOB-ORD-B81C3AE8`.
+* **`user_id`**: Foreign key to `user(user_id)` (Job creator/Lead installer).
+* **`order_id`**: Foreign key to `orders(id)` (Linked website order).
+* **`status`**: Job status (`Active`, `Completed`, `Cancelled`).
+* **`installation_address`**: Installation address copied from order.
+* **`start_time`**, **`end_time`**: Job start and completion timestamps.
+
+#### 6. `asset` Table (Tools & Assets Logged)
+Stores tools, vehicles, and equipment logged for an installation job.
+* **`asset_id`**: Primary key (`int(11)`).
+* **`job_id`**: Foreign key to `job(job_id)`.
+* **`name`**: Asset name e.g. `Scaffold Section A`, `Paste Brush Set`.
+* **`category`**: Asset category (`Dispatch`, `Equipment`, `Vehicle`).
+* **`status`**: Usage status (`In Use`, `Out for Service`).
+* **`quantity`**: Quantity logged.
+
+#### 7. `team_member` Table (Installation Team)
+Stores field service technicians and riggers assigned to a job.
+* **`member_id`**: Primary key (`int(11)`).
+* **`job_id`**: Foreign key to `job(job_id)`.
+* **`full_name`**: Member full name.
+* **`role`**: Position e.g. `Lead Installer`, `Technician`, `Driver`.
+* **`phone`**: Contact phone number.
+
+#### 8. `site_photo` Table (Completed Work Site Photos)
+Stores site photos uploaded during or after installation.
+* **`photo_id`**: Primary key (`int(11)`).
+* **`job_id`**: Foreign key to `job(job_id)`.
+* **`file_url`**: Server image path in `uploads/`.
+* **`caption`**: Optional photo caption.
+
+#### 9. `reflection` Table (Post-Job Reflections)
+Stores post-installation reviews and team return checks.
+* **`reflection_id`**: Primary key (`int(11)`).
+* **`job_id`**: Foreign key to `job(job_id)` (`UNIQUE`).
+* **`notes`**: Reflection notes text.
+* **`team_must_return`**: Return requirement (`1` = Yes, `0` = No).
+* **`submitted`**: Submission status (`1` = Submitted, `0` = Draft).
+
+#### 10. `users` Table (Website Client Accounts)
+Stores registered website user accounts.
+* **`id`**: Primary key (`bigint(20)`).
+* **`name`**: Customer name.
+* **`email`**: Customer email address (`UNIQUE`).
+* **`role`**: Account role (`user` or `admin`).
+
 ---
 
-## 🧪 Automated Test Suite & CI/CD
+## Application Screenshots & UI Showcase
+
+| Website Orders Screen | Single-Page Job Summary | Asset Management & Log | Post-Job Reflection |
+| :---: | :---: | :---: | :---: |
+| *(Website Orders with Product Images & Line-by-Line Details)* | *(Editable Job Summary with Assets, Team & Reflection)* | *(Tools & Assets Logged with Category Filtering)* | *(Post-Job Reflection & Team Return Status)* |
+
+---
+
+## Automated Test Suite & CI/CD
 
 The application includes an automated test suite comprising **18 tests** covering unit logic, stress testing, performance benchmarks, and end-to-end system workflows.
 
-### 📋 Included Test Modules (`app/src/test/java/com/awesum/assetmanagement/`)
+### Included Test Modules (`app/src/test/java/com/awesum/assetmanagement/`)
 
 1. **Unit Tests**:
    * `OrderTest.kt`: Validates order model creation, customer details, item mapping, and copy/equality methods.
@@ -285,7 +384,7 @@ The application includes an automated test suite comprising **18 tests** coverin
 
 ---
 
-### 🏃 Running Tests Locally
+### Running Tests Locally
 
 Run the automated test suite in Android Studio terminal:
 
@@ -295,7 +394,7 @@ Run the automated test suite in Android Studio terminal:
 
 ---
 
-### 🤖 Automated GitHub Actions CI/CD (`.github/workflows/android_ci.yml`)
+### Automated GitHub Actions CI/CD (`.github/workflows/android_ci.yml`)
 
 Whenever code is pushed to GitHub or a Pull Request is created:
 1. **GitHub Actions Runner** automatically spins up a JDK 17 environment.
@@ -303,22 +402,22 @@ Whenever code is pushed to GitHub or a Pull Request is created:
 3. Compiles the Android APK (`./gradlew assembleDebug`).
 4. Generates automated test reports.
 
-#### ✅ Live GitHub Actions CI/CD Verification (`run #4`)
+#### Live GitHub Actions CI/CD Verification (`run #4`)
 
 | CI/CD Metric | Live GitHub Actions Value | Status |
 | :--- | :--- | :---: |
-| **Repository** | `clivexab-blip/AwesumAssetManagement` | ✅ Passed |
-| **Workflow Name** | `Android CI & Automated Test Suite` | ✅ Passed |
-| **Trigger Event** | `push` (`master` branch) | ✅ Passed |
-| **Requested Task** | `testDebugUnitTest` | ✅ Passed |
-| **Gradle Version** | `9.8.1` | ✅ Passed |
-| **Total CI Duration** | `2m 14s` | ✅ Passed |
-| **Test Outcome** | **18 Passed / 0 Failed** | ✅ **SUCCESS** |
-| **Test Artifact** | `unit-test-results` | ✅ Uploaded |
+| **Repository** | `clivexab-blip/AwesumAssetManagement` | Passed |
+| **Workflow Name** | `Android CI & Automated Test Suite` | Passed |
+| **Trigger Event** | `push` (`master` branch) | Passed |
+| **Requested Task** | `testDebugUnitTest` | Passed |
+| **Gradle Version** | `9.8.1` | Passed |
+| **Total CI Duration** | `2m 14s` | Passed |
+| **Test Outcome** | **18 Passed / 0 Failed** | **SUCCESS** |
+| **Test Artifact** | `unit-test-results` | Uploaded |
 
 ---
 
-## 🛠️ Technology Stack
+## Technology Stack
 
 *   **Mobile**: Android (Kotlin, ViewPager2, Retrofit, Coroutines, Glide, Material 3).
 *   **Auth**: Firebase Authentication (Google Identity).
@@ -329,7 +428,7 @@ Whenever code is pushed to GitHub or a Pull Request is created:
 
 ---
 
-## 🌍 Complete Guide: Deploying & Connecting to Afrihost
+## Complete Guide: Deploying & Connecting to Afrihost
 
 This section provides a step-by-step guide to hosting your database and PHP backend on **Afrihost cPanel** and connecting the Android app to it.
 
@@ -451,7 +550,7 @@ object ApiClient {
 
 ---
 
-## ⚙️ Local Development (XAMPP / Android Emulator)
+## Local Development (XAMPP / Android Emulator)
 
 For local testing on the Android Emulator:
 1. Copy `backend/` files to `C:/xampp/htdocs/awesum_api/`.
@@ -460,5 +559,5 @@ For local testing on the Android Emulator:
 
 ---
 
-## 📄 License
+## License
 This application is designed for field installation tracking, asset management, and website order synchronization.
